@@ -1,7 +1,7 @@
 Summary
 ======
 
-Don't you hate it when a co-worker leaves your company and you never got the chance to say goodbye?
+Don't you hate it when a co-worker leaves your company and you never get the chance to say goodbye?
 
 EmployeeTracker solves the problem of Employers not notifying their employees of departures or new hires by monitoring 
 a URL that contains a list of employees and employee id numbers.  
