@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -37,7 +36,7 @@ namespace EmployeeTracker
             
             EmployeeStore employeeStore = new EmployeeStore();
             var currentEmployees = GetCurrentEmployees(username, password).Result.ToList();
-            var previousEmployees = employeeStore.GetPreviousEmployees().ToList();
+            var previousEmployees = employeeStore.GetPreviousEmployees();
             var newEmployees = DiffEmployees(currentEmployees, previousEmployees).ToList();
             var deletedEmployees = DiffEmployees(previousEmployees, currentEmployees).ToList();
 
@@ -47,6 +46,19 @@ namespace EmployeeTracker
                 return;
             }
 
+            PrintNewEmployees(newEmployees);
+            IdentifyDeletedEmployees(deletedEmployees, previousEmployees);
+            UpdateLastSeenDates(previousEmployees);
+            SaveEmployeesList(employeeStore, previousEmployees, newEmployees);
+        }
+
+        private static void SaveEmployeesList(EmployeeStore employeeStore, IList<Employee> previousEmployees, IList<Employee> newEmployees)
+        {
+            employeeStore.SaveEmployees(previousEmployees.Union(newEmployees));
+        }
+
+        private static void PrintNewEmployees(List<Employee> newEmployees)
+        {
             if (newEmployees.Any())
             {
                 Console.WriteLine("New Employees:");
@@ -55,7 +67,10 @@ namespace EmployeeTracker
             {
                 Console.WriteLine(newEmployee);
             }
+        }
 
+        private static void IdentifyDeletedEmployees(IList<Employee> deletedEmployees, IList<Employee> previousEmployees)
+        {
             if (deletedEmployees.Any())
             {
                 Console.WriteLine("Deleted Employees:");
@@ -63,9 +78,20 @@ namespace EmployeeTracker
             foreach (var deletedEmployee in deletedEmployees)
             {
                 Console.WriteLine(deletedEmployee);
+                var previouslyDeletedEmployee = previousEmployees.First(i => i.EmployeeId == deletedEmployee.EmployeeId);
+                previouslyDeletedEmployee.MarkDeleted();
             }
+        }
 
-            employeeStore.SaveEmployees(currentEmployees.Union(newEmployees));
+        private static void UpdateLastSeenDates(IList<Employee> previousEmployees)
+        {
+            foreach (var previousEmployee in previousEmployees)
+            {
+                if (!previousEmployee.IsDeleted)
+                {
+                    previousEmployee.LastSeen = DateTime.Now;
+                }
+            }
         }
 
         private static IEnumerable<Employee> DiffEmployees(IEnumerable<Employee> currentEmployees, IEnumerable<Employee> previousEmployees)

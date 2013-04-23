@@ -9,11 +9,13 @@ namespace EmployeeTracker
     {
         private const string FileName = "EmployeeList.csv";
         
-        public IEnumerable<Employee> GetPreviousEmployees()
+        public IList<Employee> GetPreviousEmployees()
         {
-            if (!File.Exists(FileName)) return Enumerable.Empty<Employee>();
-            var csv = new CsvReader(new StreamReader(FileName));
-            return csv.GetRecords<Employee>();
+            if (!File.Exists(FileName)) return new List<Employee>();
+            using (var csv = new CsvReader(new StreamReader(FileName)))
+            {
+                return csv.GetRecords<Employee>().ToList();
+            }
         }
 
         public void SaveEmployees(IEnumerable<Employee> employees)

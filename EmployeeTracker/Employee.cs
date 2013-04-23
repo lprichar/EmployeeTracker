@@ -25,11 +25,24 @@ namespace EmployeeTracker
             EmployeeId = int.Parse(employeeId);
             Name = username;
             LastSeen = DateTime.Now;
+            FirstSeen = DateTime.Now;
+        }
+
+        public void MarkDeleted()
+        {
+            Deleted = DateTime.Now;
+        }
+
+        public bool IsDeleted
+        {
+            get { return Deleted != null; }
         }
 
         public int EmployeeId { get; set; }
         public string Name { get; set; }
         public DateTime LastSeen { get; set; }
+        public DateTime FirstSeen { get; set; }
+        public DateTime? Deleted { get; set; }
 
         public override string ToString()
         {
