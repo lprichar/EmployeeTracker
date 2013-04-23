@@ -18,7 +18,7 @@ namespace EmployeeTracker
 
         public void SaveEmployees(IEnumerable<Employee> employees)
         {
-            IEnumerable<string> employeesAsString = employees.Select(i => i.ToString());
+            IEnumerable<string> employeesAsString = employees.Select(i => i.ToCsv());
             File.WriteAllText(FileName, string.Join("\n", employeesAsString));
         }
     }

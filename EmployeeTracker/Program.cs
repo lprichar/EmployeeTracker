@@ -37,7 +37,7 @@ namespace EmployeeTracker
             
             EmployeeStore employeeStore = new EmployeeStore();
             var currentEmployees = GetCurrentEmployees(username, password).Result.ToList();
-            var previousEmployees = employeeStore.GetPreviousEmployees();
+            var previousEmployees = employeeStore.GetPreviousEmployees().ToList();
             var newEmployees = DiffEmployees(currentEmployees, previousEmployees).ToList();
             var deletedEmployees = DiffEmployees(previousEmployees, currentEmployees).ToList();
 
