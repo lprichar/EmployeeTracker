@@ -6,7 +6,7 @@ Don't you hate it when a co-worker leaves your company and you never got the cha
 EmployeeTracker solves the problem of Employers not notifying their employees of departures or new hires by monitoring 
 a URL that contains a list of employees and employee id numbers.  
 
-The software notifies you when employees are added or removed from the list.  It also keeps track of 
+The software notifies you when employees are added to or removed from the list.  It also keeps track of 
 the hire and departure dates of all employees and reports on some basic statistics like employee retention.
 
 Finally EmployeeTracker stores all information in a .csv file so you can easly generate your own statistics
