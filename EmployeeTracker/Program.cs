@@ -20,7 +20,6 @@ namespace EmployeeTracker
             {
                 Console.WriteLine("Error: " + ex);
             }
-            Console.WriteLine("Press Any Key");
             Console.ReadKey();
         }
 
@@ -38,7 +37,7 @@ namespace EmployeeTracker
             var currentEmployees = GetCurrentEmployees(username, password).Result.ToList();
             var previousEmployees = employeeStore.GetPreviousEmployees();
             var newEmployees = DiffEmployees(currentEmployees, previousEmployees).ToList();
-            var deletedEmployees = DiffEmployees(previousEmployees, currentEmployees).ToList();
+            var deletedEmployees = DiffEmployees(previousEmployees.Where(i => !i.IsDeleted), currentEmployees).ToList();
 
             if (!currentEmployees.Any())
             {
@@ -49,38 +48,67 @@ namespace EmployeeTracker
             PrintNewEmployees(newEmployees);
             IdentifyDeletedEmployees(deletedEmployees, previousEmployees);
             UpdateLastSeenDates(previousEmployees);
-            SaveEmployeesList(employeeStore, previousEmployees, newEmployees);
+            
+            var newEmployeeList = previousEmployees.Union(newEmployees).ToList();
+            PrintStats(newEmployeeList);
+            employeeStore.SaveEmployees(newEmployeeList);
         }
 
-        private static void SaveEmployeesList(EmployeeStore employeeStore, IList<Employee> previousEmployees, IList<Employee> newEmployees)
+        private static void PrintStats(List<Employee> newEmployeeList)
         {
-            employeeStore.SaveEmployees(previousEmployees.Union(newEmployees));
+            var lastFiveDeletedEmployees = newEmployeeList.Where(i => i.IsDeleted).OrderByDescending(i => i.Deleted).Take(5);
+            var lastFiveAddedEmployees = newEmployeeList.Where(i => !i.IsDeleted).OrderByDescending(i => i.FirstSeen).Take(5);
+            WriteSectionHeader("Recently Departed:");
+            foreach (var employee in lastFiveDeletedEmployees)
+            {
+                Console.WriteLine("{0} ({1}) left {2:g}", employee.Name, employee.EmployeeId, employee.Deleted);
+            }
+            Console.WriteLine();
+
+            WriteSectionHeader("Recently Hired:");
+            foreach (var employee in lastFiveAddedEmployees)
+            {
+                Console.WriteLine("{0} ({1}) hired {2:g}", employee.Name, employee.EmployeeId, employee.FirstSeen);
+            }
+            Console.WriteLine();
+
+            WriteSectionHeader("Stats");
+            int activeEmployeeCount = newEmployeeList.Count(i => !i.IsDeleted);
+            int deletedEmployeeCount = newEmployeeList.Count(i => i.IsDeleted);
+            var churn = activeEmployeeCount == 0 ? 0 : deletedEmployeeCount / activeEmployeeCount;
+            Console.WriteLine("Current Active Employees: " + activeEmployeeCount);
+            Console.WriteLine("Known Deleted Employees: " + deletedEmployeeCount);
+            Console.WriteLine("Churn: {0:p}", churn);
+            Console.WriteLine();
         }
 
         private static void PrintNewEmployees(List<Employee> newEmployees)
         {
-            if (newEmployees.Any())
-            {
-                Console.WriteLine("New Employees:");
-            }
+            WriteSectionHeader("Newly Hired Employees:");
             foreach (var newEmployee in newEmployees)
             {
                 Console.WriteLine(newEmployee);
             }
+            Console.WriteLine();
         }
 
+        private static void WriteSectionHeader(string header)
+        {
+            Console.WriteLine("-----------------------------");
+            Console.WriteLine(header);
+            Console.WriteLine("-----------------------------");
+        }
+        
         private static void IdentifyDeletedEmployees(IList<Employee> deletedEmployees, IList<Employee> previousEmployees)
         {
-            if (deletedEmployees.Any())
-            {
-                Console.WriteLine("Deleted Employees:");
-            }
+            WriteSectionHeader("Newly Departed Employees:");
             foreach (var deletedEmployee in deletedEmployees)
             {
                 Console.WriteLine(deletedEmployee);
                 var previouslyDeletedEmployee = previousEmployees.First(i => i.EmployeeId == deletedEmployee.EmployeeId);
                 previouslyDeletedEmployee.MarkDeleted();
             }
+            Console.WriteLine();
         }
 
         private static void UpdateLastSeenDates(IList<Employee> previousEmployees)
