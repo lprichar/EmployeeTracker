@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CsvHelper;
 
 namespace EmployeeTracker
 {
@@ -11,15 +12,16 @@ namespace EmployeeTracker
         public IEnumerable<Employee> GetPreviousEmployees()
         {
             if (!File.Exists(FileName)) return Enumerable.Empty<Employee>();
-            var previousEmployeesStr = File.ReadAllText(FileName);
-            var previousEmployeesList = previousEmployeesStr.Split('\n');
-            return previousEmployeesList.Where(i => !string.IsNullOrEmpty(i)).Select(i => new Employee(i));
+            var csv = new CsvReader(new StreamReader(FileName));
+            return csv.GetRecords<Employee>();
         }
 
         public void SaveEmployees(IEnumerable<Employee> employees)
         {
-            IEnumerable<string> employeesAsString = employees.Select(i => i.ToCsv());
-            File.WriteAllText(FileName, string.Join("\n", employeesAsString));
+            using (var csv = new CsvWriter(new StreamWriter(FileName)))
+            {
+                csv.WriteRecords(employees);
+            }
         }
     }
 }

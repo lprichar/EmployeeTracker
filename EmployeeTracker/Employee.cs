@@ -27,23 +27,10 @@ namespace EmployeeTracker
             LastSeen = DateTime.Now;
         }
 
-        public Employee(string csv)
-        {
-            var items = csv.Split('\t');
-            EmployeeId = int.Parse(items[0]);
-            Name = items[1];
-            LastSeen = DateTime.Parse(items[2]);
-        }
-
         public int EmployeeId { get; set; }
         public string Name { get; set; }
         public DateTime LastSeen { get; set; }
 
-        public string ToCsv()
-        {
-            return string.Format("{0}\t{1}\t{2}", EmployeeId, Name, LastSeen);
-        }
-        
         public override string ToString()
         {
             return string.Format("{0} ({1})", Name, EmployeeId);

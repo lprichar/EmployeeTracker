@@ -41,6 +41,12 @@ namespace EmployeeTracker
             var newEmployees = DiffEmployees(currentEmployees, previousEmployees).ToList();
             var deletedEmployees = DiffEmployees(previousEmployees, currentEmployees).ToList();
 
+            if (!currentEmployees.Any())
+            {
+                Console.WriteLine("Invalid password or some other error");
+                return;
+            }
+
             if (newEmployees.Any())
             {
                 Console.WriteLine("New Employees:");
@@ -60,13 +66,6 @@ namespace EmployeeTracker
             }
 
             employeeStore.SaveEmployees(currentEmployees.Union(newEmployees));
-            
-            if (!currentEmployees.Any())
-            {
-                Console.WriteLine("Invalid password or some other error");
-                return;
-            }
-            File.WriteAllText("out.html", string.Join("\n", currentEmployees.Select(i => i.ToString())));
         }
 
         private static IEnumerable<Employee> DiffEmployees(IEnumerable<Employee> currentEmployees, IEnumerable<Employee> previousEmployees)
