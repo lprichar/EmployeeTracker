@@ -1,21 +1,31 @@
 Summary
 ======
 
-Don't you hate it when an Employee leaves your company and you don't get the chance to say goodbye?
+Don't you hate it when a co-worker leaves your company and you never got the chance to say goodbye?
 
-EmployeeTracker monitors a URL that contains a list of employees and employee id numbers and notifies you
-when an employee is added to or removed from the list.
+EmployeeTracker solves the problem of Employers not notifying their employees of departures or new hires by monitoring 
+a URL that contains a list of employees and employee id numbers.  
 
-EmployeeTracker also keeps track of the hire dates and departure dates of all employees and reports on some statistics like employee retention.
+The software notifies you when employees are added or removed from the list.  It also keeps track of 
+the hire and departure dates of all employees and reports on some basic statistics like employee retention.
 
-Currently EmployeeTracker assumes that the content is stored in Confluence and so it logs in to an employee list via Confluences form authentication.
+Finally EmployeeTracker stores all information in a .csv file so you can easly generate your own statistics
+in a spreadsheet application.
+
+Caveats
+======
+
+Currently EmployeeTracker assumes that the content is stored in Confluence and so it logs in to an employee 
+list via Confluence's forms authentication.
+
+Furthermore, the regular expressions that retrieves employee information will probably require some manual 
+modification (in Program.cs).  If there is interest in this project I'll be happy to make this logic 
+more generic.
 
 Configuration
 ======
 
 After downloading and compiling you may need to change the location of the page to retrieve employees from.  The setting is located in the App.config file.
-
-You may also need to fiddle with the Regular expressions that retrieve employee information.  This currently must be done in code (in Program.cs).
 
 Setup
 ======
