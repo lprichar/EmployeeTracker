@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -144,13 +145,14 @@ namespace EmployeeTracker
             using (var handler = new HttpClientHandler {CookieContainer = cookieContainer})
             using (var client = new HttpClient(handler) {BaseAddress = baseAddress})
             {
+                string employeesUrl = ConfigurationManager.AppSettings["EmployeesUrl"];
                 var content = new FormUrlEncodedContent(new[]
                     {
                         new KeyValuePair<string, string>("os_username", username),
                         new KeyValuePair<string, string>("os_password", password),
                         new KeyValuePair<string, string>("os_cookie", "true"),
                         new KeyValuePair<string, string>("login", "Log In"),
-                        new KeyValuePair<string, string>("os_destination", "/display/HR/Employee+Numbers")
+                        new KeyValuePair<string, string>("os_destination", employeesUrl)
                     });
                 var result = client.PostAsync("/dologin.action", content).Result;
                 result.EnsureSuccessStatusCode();
