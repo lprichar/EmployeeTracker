@@ -38,7 +38,8 @@ namespace EmployeeTracker
             EmployeeStore employeeStore = new EmployeeStore();
             var currentEmployees = GetCurrentEmployees(username, password).Result.ToList();
             var previousEmployees = employeeStore.GetPreviousEmployees();
-            var newEmployees = GetNewEmployees(currentEmployees, previousEmployees).ToList();
+            var newEmployees = DiffEmployees(currentEmployees, previousEmployees).ToList();
+            var deletedEmployees = DiffEmployees(previousEmployees, currentEmployees).ToList();
 
             if (newEmployees.Any())
             {
@@ -47,6 +48,15 @@ namespace EmployeeTracker
             foreach (var newEmployee in newEmployees)
             {
                 Console.WriteLine(newEmployee);
+            }
+
+            if (deletedEmployees.Any())
+            {
+                Console.WriteLine("Deleted Employees:");
+            }
+            foreach (var deletedEmployee in deletedEmployees)
+            {
+                Console.WriteLine(deletedEmployee);
             }
 
             employeeStore.SaveEmployees(currentEmployees.Union(newEmployees));
@@ -59,7 +69,7 @@ namespace EmployeeTracker
             File.WriteAllText("out.html", string.Join("\n", currentEmployees.Select(i => i.ToString())));
         }
 
-        private static IEnumerable<Employee> GetNewEmployees(IEnumerable<Employee> currentEmployees, IEnumerable<Employee> previousEmployees)
+        private static IEnumerable<Employee> DiffEmployees(IEnumerable<Employee> currentEmployees, IEnumerable<Employee> previousEmployees)
         {
             var previousEmployeesDict = previousEmployees.ToDictionary(i => i.EmployeeId, i => i.Name);
             return currentEmployees.Where(current => !previousEmployeesDict.ContainsKey(current.EmployeeId));
