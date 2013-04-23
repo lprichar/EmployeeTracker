@@ -38,7 +38,18 @@ namespace EmployeeTracker
             EmployeeStore employeeStore = new EmployeeStore();
             var currentEmployees = GetCurrentEmployees(username, password).Result.ToList();
             var previousEmployees = employeeStore.GetPreviousEmployees();
-            employeeStore.SaveEmployees(currentEmployees);
+            var newEmployees = GetNewEmployees(currentEmployees, previousEmployees).ToList();
+
+            if (newEmployees.Any())
+            {
+                Console.WriteLine("New Employees:");
+            }
+            foreach (var newEmployee in newEmployees)
+            {
+                Console.WriteLine(newEmployee);
+            }
+
+            employeeStore.SaveEmployees(currentEmployees.Union(newEmployees));
             
             if (!currentEmployees.Any())
             {
@@ -46,6 +57,12 @@ namespace EmployeeTracker
                 return;
             }
             File.WriteAllText("out.html", string.Join("\n", currentEmployees.Select(i => i.ToString())));
+        }
+
+        private static IEnumerable<Employee> GetNewEmployees(IEnumerable<Employee> currentEmployees, IEnumerable<Employee> previousEmployees)
+        {
+            var previousEmployeesDict = previousEmployees.ToDictionary(i => i.EmployeeId, i => i.Name);
+            return currentEmployees.Where(current => !previousEmployeesDict.ContainsKey(current.EmployeeId));
         }
 
         private static async Task<IEnumerable<Employee>> GetCurrentEmployees(string username, string password)

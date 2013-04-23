@@ -13,7 +13,7 @@ namespace EmployeeTracker
             if (!File.Exists(FileName)) return Enumerable.Empty<Employee>();
             var previousEmployeesStr = File.ReadAllText(FileName);
             var previousEmployeesList = previousEmployeesStr.Split('\n');
-            return previousEmployeesList.Select(i => new Employee(i));
+            return previousEmployeesList.Where(i => !string.IsNullOrEmpty(i)).Select(i => new Employee(i));
         }
 
         public void SaveEmployees(IEnumerable<Employee> employees)
