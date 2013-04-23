@@ -25,12 +25,19 @@ namespace EmployeeTracker
             Name = username;
         }
 
+        public Employee(string csv)
+        {
+            var items = csv.Split(',');
+            EmployeeId = int.Parse(items[0]);
+            Name = items[1];
+        }
+
         public int EmployeeId { get; set; }
         public string Name { get; set; }
 
         public override string ToString()
         {
-            return string.Format("{0}\t{1}", EmployeeId, Name);
+            return string.Format("{0},{1}", EmployeeId, Name);
         }
     }
 }

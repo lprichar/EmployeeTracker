@@ -32,16 +32,23 @@ namespace EmployeeTracker
                 Console.WriteLine("usage: EmployeeTracker.exe username password");
                 return;
             }
-            var employees = GetEmployees(args[0], args[1]).Result.ToList();
-            if (!employees.Any())
+            string username = args[0];
+            string password = args[1];
+            
+            EmployeeStore employeeStore = new EmployeeStore();
+            var currentEmployees = GetCurrentEmployees(username, password).Result.ToList();
+            var previousEmployees = employeeStore.GetPreviousEmployees();
+            employeeStore.SaveEmployees(currentEmployees);
+            
+            if (!currentEmployees.Any())
             {
                 Console.WriteLine("Invalid password or some other error");
                 return;
             }
-            File.WriteAllText("out.html", string.Join("\n", employees.Select(i => i.ToString())));
+            File.WriteAllText("out.html", string.Join("\n", currentEmployees.Select(i => i.ToString())));
         }
 
-        private static async Task<IEnumerable<Employee>> GetEmployees(string username, string password)
+        private static async Task<IEnumerable<Employee>> GetCurrentEmployees(string username, string password)
         {
             var htmlResult = await GetEmployeeNumbersPageFromMobius(username, password);
             var matchCollection = Regex.Matches(htmlResult, "\\<td class=\\\"confluenceTd\\\"\\>\\<p\\>(.*)\\<\\/p\\>\\<\\/td\\>\n\\<td class=\\\"confluenceTd\\\"\\>\\<p\\>(.*)\\<\\/p\\>\\<\\/td\\>\n");
